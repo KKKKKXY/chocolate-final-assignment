@@ -33,9 +33,10 @@ class BuildEstimator:
         # read the data from csv file which is called 'flavors_of_cacao.csv' and stored in variable which is rawData
         rawData = pd.read_csv('api/lib/data/flavors_of_cacao.csv')
         #drop the colunms which are 'REF' and 'Specific Bean Origin\nor Bar Name'
-        rawData = rawData.drop(columns=['REF','Specific Bean Origin\nor Bar Name'])
+        rawData = rawData.drop(columns=['REF','Specific Bean Origin\nor Bar Name', 'Review\nDate'])
+        
         #take specified colunms include 'Company','ReviewDate','CocoaPercent','CompanyLocation','Rating','BeanType', and 'BeanOrigin'
-        rawData.columns = ['Company','ReviewDate','CocoaPercent','CompanyLocation','Rating','BeanType','BeanOrigin']
+        rawData.columns = ['Company','CocoaPercent','CompanyLocation','Rating','BeanType','BeanOrigin']
         #in Company colunm split each row by '(' and strip the row
         rawData['Company'] = [x.split('(')[0].strip() for x in rawData['Company']]
         #remove the '%' and convert the rest of part into float type in CocoaPercent colunm
@@ -136,7 +137,6 @@ class BuildEstimator:
         cv = GridSearchCV(pipe,search_params,cv=10,verbose=0,scoring='neg_mean_squared_error',n_jobs=-1,error_score=0.0)
         #fit the model with parameters X and y
         
-        # data_dmatrix = xgb.DMatrix(data=X, label=y)
         # cv = xgb.XGBRegressor(objective='reg:linear', colsample_bytree=0.3, learning_rate=0.1, max_depth=5, alpha=10, n_estimators=10)
         
         cv.fit(X, y)
@@ -165,7 +165,7 @@ class BuildEstimator:
         
         #optimize the model by inserting the parameters 'XFit' and 'yFit', and get the best estimator
         optimizedModel = BuildEstimator.getBestPipeline(XFit,yFit).best_estimator_
-        #optimizedModel = BuildEstimator.getBestPipeline(XFit,yFit)
+        # optimizedModel = BuildEstimator.getBestPipeline(XFit,yFit)
         #predict 'XFit' and saved into 'yPredFit'
         yPredFit = optimizedModel.predict(XFit)
         #predict 'XBlindTest' and saved into 'yPredTest'
